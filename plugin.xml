@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova.plugin.zoom" version="5.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>Zoom</name>
+    <js-module name="Zoom" src="www/Zoom.js">
+        <clobbers target="cordova.plugins.Zoom" />
+    </js-module>
+    <platform name="android">
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="Zoom">
+                <param name="android-package" value="cordova.plugin.zoom.Zoom" />
+            </feature>
+        </config-file>
+        <config-file parent="/*" target="AndroidManifest.xml">
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+            <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+            <uses-permission android:name="android.permission.RECORD_AUDIO" />
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+            <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+            <uses-permission android:name="android.permission.WAKE_LOCK" />
+            <uses-permission android:name="android.permission.CALL_PHONE" />
+            <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+        </config-file>
+        <dependency id="cordova-androidx-build" url="https://github.com/Pushwoosh/cordova-androidx-build.git" />
+        <source-file framework="true" src="libs/android/commonlib.aar" target-dir="libs/android" />
+        <source-file framework="true" src="libs/android/mobilertc.aar" target-dir="libs/android" />
+        <source-file framework="true" src="src/android/AuthThread.java" target-dir="src/cordova/plugin/zoom" />
+        <source-file src="src/android/Zoom.java" target-dir="src/cordova/plugin/zoom" />
+        <framework custom="true" src="src/android/build-extras.gradle" target-dir="." type="gradleReference" />
+    </platform>
+    <platform name="ios">
+        <hook type="before_plugin_install" src="hooks/install_prerequisites.js"/>
+        <hook type="after_plugin_add" src="hooks/add_swift_support.js" />
+        <config-file parent="/*" target="config.xml">
+            <feature name="Zoom">
+                <param name="ios-package" value="Zoom" />
+            </feature>
+        </config-file>
+        <resource-file src="libs/ios/MobileRTCResources.bundle" />
+        <source-file src="libs/ios/MobileRTC.framework" target-dir="lib" framework="true" />
+        <framework custom="true" embed="true" src="libs/ios/MobileRTC.framework" />
+        <source-file src="src/ios/Zoom.swift" />
+        <!--
+        <source-file src="src/ios/AppDelegate+Zoom.swift" />
+        <source-file src="src/ios/JWTGenerator.swift" />
+        <source-file src="src/ios/ZoomSDKInitializer.swift" />
+        <source-file src="src/ios/JWTClaims.swift" />
+        -->
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+      <string>$IOS_CAMERA_USAGE_DESCRIPTION</string>
+    </config-file>  
+
+    <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
+      <string>$IOS_MICROPHONE_USAGE_DESCRIPTION</string>
+    </config-file>  
+    </platform>
+</plugin>
