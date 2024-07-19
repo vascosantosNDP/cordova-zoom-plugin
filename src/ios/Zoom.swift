@@ -17,7 +17,7 @@ class Zoom: CDVPlugin {
     func initialize(command: CDVInvokedUrlCommand) {
         self.command = command
         let JWT = command.arguments[0] as? String ?? ""
-        let locale = command.arguments[0] as? String ?? "en_US"
+        let locale = command.arguments[1] as? String ?? "en_US"
         let initContext = MobileRTCSDKInitContext()
         initContext.domain = "https://zoom.us"
         
