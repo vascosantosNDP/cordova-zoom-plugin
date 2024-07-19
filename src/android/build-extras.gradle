@@ -21,7 +21,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/pcamilojunior/mobile-sdk-android")
         credentials {
             username = "pcamilojunior"
-            password = "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"
+            password = "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"
         }
     }
 }
