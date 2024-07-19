@@ -17,8 +17,12 @@ repositories {
     flatDir {
         dirs 'libs/android'
     }
-    maven {
+   maven {
         url = uri("https://maven.pkg.github.com/pcamilojunior/mobile-sdk-android")
+        credentials {
+            username = "pcamilojunior"
+            password = "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"
+        }
     }
 }
 dependencies {
