@@ -4,6 +4,8 @@
     <js-module name="Zoom" src="www/Zoom.js">
         <clobbers target="cordova.plugins.Zoom" />
     </js-module>
+
+     <!-- Android section -->
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="Zoom">
@@ -19,8 +21,10 @@
             <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
             <uses-permission android:name="android.permission.RECORD_AUDIO" />
             <uses-permission android:name="android.permission.CAMERA" />
-            <uses-permission android:name="android.permission.BLUETOOTH" />
-            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+            <uses-permission android:name="android.permission.BLUETOOTH"/>
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+            <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+            <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
             <uses-permission android:name="android.permission.BROADCAST_STICKY" />
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -28,11 +32,11 @@
         </config-file>
         <dependency id="cordova-androidx-build" url="https://github.com/Pushwoosh/cordova-androidx-build.git" />
         <source-file framework="true" src="libs/android/commonlib.aar" target-dir="libs/android" />
-        <source-file framework="true" src="libs/android/mobilertc.aar" target-dir="libs/android" />
-        <source-file framework="true" src="src/android/AuthThread.java" target-dir="src/cordova/plugin/zoom" />
         <source-file src="src/android/Zoom.java" target-dir="src/cordova/plugin/zoom" />
         <framework custom="true" src="src/android/build-extras.gradle" target-dir="." type="gradleReference" />
     </platform>
+
+    <!-- IOS section -->
     <platform name="ios">
         <hook type="before_plugin_install" src="hooks/install_prerequisites.js"/>
         <hook type="after_plugin_add" src="hooks/add_swift_support.js" />
