@@ -11,16 +11,20 @@ function callNativeFunction(name, args, success, error) {
 
 var zoom = {
 
-    initialize: function(token, success, error) {
-        callNativeFunction('initialize', [token], success, error);
+    initialize: function(token, language, success, error) {
+        callNativeFunction('initialize', [token, language], success, error);
     },
 
     joinMeeting: function(meetingNo, meetingPassword, displayName, noAudio, noVideo, success, error) {
          callNativeFunction('joinMeeting', [meetingNo, meetingPassword, displayName, noAudio, noVideo], success, error);
     },
 
-    setLocale: function(languageTag, success, error) {
-        callNativeFunction('setLocale', [languageTag], success, error);
+    setMeetingCallback: function(success, error) {
+        callNativeFunction('setMeetingCallback', success, error);
+    },
+
+    closeMeetingCallback: function(success, error) {
+        callNativeFunction('closeMeetingCallback', success, error);
     }
 
 };
