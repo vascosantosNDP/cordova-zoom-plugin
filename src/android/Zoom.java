@@ -9,7 +9,6 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.Locale;
 
@@ -20,7 +19,6 @@ import us.zoom.sdk.MeetingParameter;
 import us.zoom.sdk.MeetingService;
 import us.zoom.sdk.MeetingServiceListener;
 import us.zoom.sdk.MeetingStatus;
-import us.zoom.sdk.MeetingViewsOptions;
 import us.zoom.sdk.ZoomError;
 import us.zoom.sdk.ZoomSDK;
 import us.zoom.sdk.ZoomSDKInitParams;
@@ -80,18 +78,10 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
             case "joinMeeting":
                 String meetingNo = args.getString(0);
                 String meetingPassword = args.getString(1);
-                String displayName = args.getString(2);
-                JSONObject options = null;
-                try {
-                    if (args.getJSONObject(3) != null) {
-                        options = args.getJSONObject(3);
-                    }
-                }catch (Exception e) {
-                    Log.v(TAG, "********** Zoom's Options null: "+e.getMessage());
-                }
-
-                JSONObject finalOptions = options;
-                ensureZoomSDKInitialized(() -> this.joinMeeting(meetingNo, meetingPassword, displayName, finalOptions, callbackContext));
+                String displayName = args.optString(2, "User");
+                boolean noAudio = args.optBoolean(3, false);
+                boolean noVideo = args.optBoolean(4, false);
+                ensureZoomSDKInitialized(() -> this.joinMeeting(meetingNo, meetingPassword, displayName, noAudio, noVideo, callbackContext));
                 break;
             case "setMeetingCallback":
                 setMeetingCallback(callbackContext);
@@ -180,10 +170,11 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
      * @param meetingNo         meeting number.
      * @param meetingPassword   meeting password
      * @param displayName       display name shown in meeting.
-     * @param option            meeting options.
+     * @param noAudio           meeting no audio.
+     * @param noVideo           meeting no video.
      * @param callbackContext   cordova callback context.
      */
-    private void joinMeeting(String meetingNo, String meetingPassword, String displayName, JSONObject option, CallbackContext callbackContext) {
+    private void joinMeeting(String meetingNo, String meetingPassword, String displayName, boolean noAudio, boolean noVideo, CallbackContext callbackContext) {
         cordova.getActivity().runOnUiThread(() -> {
             if (DEBUG) { Log.v(TAG, "********** Zoom's join meeting called ,meetingNo=" + meetingNo + " **********"); }
 
@@ -229,47 +220,19 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
             params.password = meetingPassword;
 
             JoinMeetingOptions opts = new JoinMeetingOptions();
-            if (option != null) {
-                try {
-                    opts.no_audio = !option.isNull("no_audio") && option.getBoolean("no_audio");
-                    opts.no_video = !option.isNull("no_video") && option.getBoolean("no_video");
-                    opts.meeting_views_options = 0;
-
-                    if (!option.isNull("no_button_video") && option.getBoolean("no_button_video")) {
-                        opts.meeting_views_options += MeetingViewsOptions.NO_BUTTON_VIDEO;
-                    }
-
-                    if (!option.isNull("no_button_audio") && option.getBoolean("no_button_audio")) {
-                        opts.meeting_views_options += MeetingViewsOptions.NO_BUTTON_AUDIO;
-                    }
-
-                } catch (JSONException ex) {
-                    if (DEBUG) { Log.i(TAG, ex.getMessage()); }
-                }
-
-                int response = meetingService.joinMeetingWithParams(cordova.getActivity().getApplicationContext(),params, opts);
-                if (DEBUG) { Log.i(TAG, "In JoinMeeting, response=" + getMeetingErrorMessage(response)); }
-                PluginResult pluginResult12;
-                if (response != MeetingError.MEETING_ERROR_SUCCESS) {
-                    pluginResult12 =  new PluginResult(PluginResult.Status.ERROR, getMeetingErrorMessage(response));
-                } else {
-                    pluginResult12 =  new PluginResult(PluginResult.Status.OK, getMeetingErrorMessage(response));
-                }
-                pluginResult12.setKeepCallback(true);
-                callbackContext.sendPluginResult(pluginResult12);
-
+            opts.no_audio = noAudio;
+            opts.no_video = noVideo;
+ 
+            int response = meetingService.joinMeetingWithParams(cordova.getActivity().getApplicationContext(), params, opts);
+            if (DEBUG) { Log.i(TAG, "In JoinMeeting, response=" + getMeetingErrorMessage(response)); }
+            PluginResult pluginResult1;
+            if (response != MeetingError.MEETING_ERROR_SUCCESS) {
+                pluginResult1 =  new PluginResult(PluginResult.Status.ERROR, getMeetingErrorMessage(response));
             } else {
-                int response = meetingService.joinMeetingWithParams(cordova.getActivity().getApplicationContext(), params, opts);
-                if (DEBUG) { Log.i(TAG, "In JoinMeeting, response=" + getMeetingErrorMessage(response)); }
-                PluginResult pluginResult1;
-                if (response != MeetingError.MEETING_ERROR_SUCCESS) {
-                    pluginResult1 =  new PluginResult(PluginResult.Status.ERROR, getMeetingErrorMessage(response));
-                } else {
-                    pluginResult1 =  new PluginResult(PluginResult.Status.OK, getMeetingErrorMessage(response));
-                }
-                pluginResult1.setKeepCallback(true);
-                callbackContext.sendPluginResult(pluginResult1);
+                pluginResult1 =  new PluginResult(PluginResult.Status.OK, getMeetingErrorMessage(response));
             }
+            pluginResult1.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult1);
         });
     }
 
