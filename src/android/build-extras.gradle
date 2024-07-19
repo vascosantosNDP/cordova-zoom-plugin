@@ -64,6 +64,5 @@ dependencies {
 
     implementation 'io.coil-kt:coil-compose:2.3.0'
     implementation(name:'commonlib', ext:'aar')
-    implementation(name:'mobilertc', ext:'aar')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
