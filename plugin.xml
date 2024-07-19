@@ -38,6 +38,8 @@
 
     <!-- IOS section -->
     <platform name="ios">
+        <preference name="IOS_CAMERA_USAGE_DESCRIPTION" default="This app requires access to the camera." />
+        <preference name="IOS_MICROPHONE_USAGE_DESCRIPTION" default="This app requires access to the microphone." />
         <hook type="before_plugin_install" src="hooks/install_prerequisites.js"/>
         <hook type="after_plugin_add" src="hooks/add_swift_support.js" />
         <config-file parent="/*" target="config.xml">
