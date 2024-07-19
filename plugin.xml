@@ -33,7 +33,7 @@
         <dependency id="cordova-androidx-build" url="https://github.com/Pushwoosh/cordova-androidx-build.git" />
         <source-file framework="true" src="libs/android/commonlib.aar" target-dir="libs/android" />
         <source-file src="src/android/Zoom.java" target-dir="src/cordova/plugin/zoom" />
-        <framework custom="true" src="src/android/build-extras.gradle" target-dir="." type="gradleReference" />
+        <framework custom="true" src="src/android/build-android.gradle" target-dir="." type="gradleReference" />
     </platform>
 
     <!-- IOS section -->
