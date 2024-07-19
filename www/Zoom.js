@@ -20,11 +20,11 @@ var zoom = {
     },
 
     setMeetingCallback: function(success, error) {
-        callNativeFunction('setMeetingCallback', success, error);
+        callNativeFunction('setMeetingCallback', [], success, error);
     },
 
     closeMeetingCallback: function(success, error) {
-        callNativeFunction('closeMeetingCallback', success, error);
+        callNativeFunction('closeMeetingCallback', [], success, error);
     }
 
 };
