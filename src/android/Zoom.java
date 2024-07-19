@@ -11,7 +11,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.IllformedLocaleException;
 import java.util.Locale;
 
 import us.zoom.sdk.JoinMeetingOptions;
@@ -35,6 +34,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
     private static final String WEB_DOMAIN = "https://zoom.us";
     private ZoomSDK mZoomSDK;
     private CallbackContext callbackContext;
+    private CallbackContext callStatusCallback;
 
     private void ensureZoomSDKInitialized(Runnable action) {
         if (mZoomSDK != null) {
@@ -65,13 +65,17 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
             Log.v(TAG, "----- [execute , args =" + args + "]");
         }
 
-        //cordova.setActivityResultCallback(this);
         this.callbackContext = callbackContext;
 
         switch(action) {
             case "initialize":
                 String jwtToken = args.getString(0);
-                ensureZoomSDKInitialized(() -> this.initializeZoomSDK(jwtToken, callbackContext));
+                String languageTag = "en_US";
+                if(args.getString(1) != null) {
+                    languageTag = args.getString(1);
+                }
+                String finalLanguageTag = languageTag;
+                ensureZoomSDKInitialized(() -> this.initializeZoomSDK(jwtToken, finalLanguageTag, callbackContext));
                 break;
             case "joinMeeting":
                 String meetingNo = args.getString(0);
@@ -89,14 +93,32 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
                 JSONObject finalOptions = options;
                 ensureZoomSDKInitialized(() -> this.joinMeeting(meetingNo, meetingPassword, displayName, finalOptions, callbackContext));
                 break;
-            case "setLocale":
-                String languageTag = args.getString(0);
-                ensureZoomSDKInitialized(() -> this.setLocale(languageTag, callbackContext));
+            case "setMeetingCallback":
+                setMeetingCallback(callbackContext);
+                break;
+            case "closeMeetingCallback":
+                closeMeetingCallback();
                 break;
             default:
                 return false;
         }
         return true;
+    }
+
+    private void setMeetingCallback(CallbackContext callbackContext) {
+        this.callStatusCallback = callbackContext;
+    }
+
+    private void closeMeetingCallback() {
+        this.callStatusCallback = null;
+    }
+
+    private void sendMeetingCallback(MeetingStatus meetingStatus) {
+        if(this.callStatusCallback != null) {
+            PluginResult pluginResult =  new PluginResult(PluginResult.Status.OK, "meetingStatus:  "+meetingStatus);
+            pluginResult.setKeepCallback(true);
+            this.callStatusCallback.sendPluginResult(pluginResult);
+        }
     }
 
     /**
@@ -107,7 +129,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
      * @param jwtToken        Zoom SDK jwtToken.
      * @param callbackContext Cordova callback context.
      */
-    private void initializeZoomSDK(String jwtToken, CallbackContext callbackContext) {
+    private void initializeZoomSDK(String jwtToken, String languageLocale, CallbackContext callbackContext) {
         cordova.getActivity().runOnUiThread(() -> {
             if (DEBUG) {
                 Log.v(TAG, "********** Zoom's initialize called **********");
@@ -133,6 +155,14 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
                     initParams.enableGenerateDump = true;
                     initParams.domain = WEB_DOMAIN;
                     initParams.videoRawDataMemoryMode = ZoomSDKRawDataMemoryMode.ZoomSDKRawDataMemoryModeStack;
+
+                    try {
+                        Locale language = new Locale.Builder().setLanguageTag(languageLocale.replaceAll("_","-")).build();
+                        mZoomSDK.setSdkLocale(cordova.getActivity().getApplicationContext(), language);
+                    } catch (Exception ex) {
+                        mZoomSDK.setSdkLocale(cordova.getActivity().getApplicationContext(), Locale.US);
+                    }
+
                     mZoomSDK.initialize(cordova.getContext(), this, initParams);
                 }
             } catch (Exception e) {
@@ -243,40 +273,12 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
         });
     }
 
-    /**
-     * setLocale
-     *
-     * Change the in-meeting language.
-     *
-     * @param languageTag       IETF BCP 47 language tag string
-     * @param callbackContext   cordova callback context
-     */
-    private void setLocale(String languageTag, CallbackContext callbackContext) {
-        try {
-            cordova.getActivity().runOnUiThread(() -> {
-                if (DEBUG) {
-                    Log.v(TAG, "[#############setLocale Thread run()##############]");
-                }
-                try {
-                    Locale language = new Locale.Builder().setLanguageTag(languageTag.replaceAll("_","-")).build();
-                    mZoomSDK.setSdkLocale(cordova.getActivity().getApplicationContext(), language);
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, "Successfully set language to " + languageTag));
-                } catch (IllformedLocaleException ie) {
-                    callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, "Please pass valid language and country codes. [ERROR:" + ie.getMessage() + "]"));
-                }
-            });
-        } catch (Exception e) {
-            callbackContext.error(e.getMessage());
-        }
-    }
-
     @Override
     public void onMeetingStatusChanged(MeetingStatus meetingStatus, int errorCode, int internalErrorCode) {
         Log.i(TAG, "onMeetingStatusChanged, meetingStatus=" + meetingStatus + ", errorCode=" + errorCode + ", internalErrorCode=" + internalErrorCode);
 
-        PluginResult pluginResult =  new PluginResult(PluginResult.Status.OK, "meetingStatus:  "+meetingStatus);
-        pluginResult.setKeepCallback(true);
-        callbackContext.sendPluginResult(pluginResult);
+        // Trigger the meeting callback
+        sendMeetingCallback(meetingStatus);
 
         if (DEBUG) {
             Log.i(TAG, "onMeetingStatusChanged, meetingStatus=" + meetingStatus + ", errorCode=" + errorCode + ", internalErrorCode=" + internalErrorCode);
@@ -402,7 +404,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
         }
 
         if (DEBUG) {
-            Log.v(TAG, "******getMeetingErrorMessage*********" + message.toString());
+            Log.v(TAG, "******getMeetingErrorMessage*********" + message);
         }
         return message.toString();
     }
