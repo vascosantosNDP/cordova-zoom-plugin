@@ -3,7 +3,6 @@ package cordova.plugin.zoom;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.apache.cordova.BuildConfig;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -28,7 +27,6 @@ import us.zoom.sdk.ZoomSDKRawDataMemoryMode;
 public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, MeetingServiceListener {
 
     private static final String TAG = "^^^ZoomCordovaPlugin^^^";
-    private static final boolean DEBUG = BuildConfig.DEBUG;
     private static final String WEB_DOMAIN = "https://zoom.us";
     private ZoomSDK mZoomSDK;
     private CallbackContext callbackContext;
@@ -58,10 +56,8 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext)
             throws JSONException {
-        if (DEBUG) {
-            Log.v(TAG, "----- [execute , action =" + action + "]");
-            Log.v(TAG, "----- [execute , args =" + args + "]");
-        }
+        Log.v(TAG, "----- [execute , action =" + action + "]");
+        Log.v(TAG, "----- [execute , args =" + args + "]");
 
         this.callbackContext = callbackContext;
 
@@ -121,9 +117,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
      */
     private void initializeZoomSDK(String jwtToken, String languageLocale, CallbackContext callbackContext) {
         cordova.getActivity().runOnUiThread(() -> {
-            if (DEBUG) {
-                Log.v(TAG, "********** Zoom's initialize called **********");
-            }
+            Log.v(TAG, "********** Zoom's initialize called **********");
 
             // If the SDK has been successfully initialized, simply return.
             if (mZoomSDK.isInitialized()) {
@@ -176,7 +170,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
      */
     private void joinMeeting(String meetingNo, String meetingPassword, String displayName, boolean noAudio, boolean noVideo, CallbackContext callbackContext) {
         cordova.getActivity().runOnUiThread(() -> {
-            if (DEBUG) { Log.v(TAG, "********** Zoom's join meeting called ,meetingNo=" + meetingNo + " **********"); }
+            Log.v(TAG, "********** Zoom's join meeting called ,meetingNo=" + meetingNo + " **********");
 
             if (meetingNo == null || meetingNo.trim().isEmpty() || meetingNo.equals("null")) {
                 callbackContext.error("Meeting number cannot be empty");
@@ -193,12 +187,6 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
             if (meetingNumber.length() < 9 || meetingNumber.length() > 11 || !meetingNumber.matches("\\d{8,11}")) {
                 callbackContext.error("Please enter a valid meeting number.");
                 return;
-            }
-
-
-            if (DEBUG) {
-                Log.v(TAG, "[Going to Join Meeting]");
-                Log.v(TAG, "[meetingNo=]" + meetingNumber);
             }
 
             PluginResult pluginResult;
@@ -224,7 +212,6 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
             opts.no_video = noVideo;
  
             int response = meetingService.joinMeetingWithParams(cordova.getActivity().getApplicationContext(), params, opts);
-            if (DEBUG) { Log.i(TAG, "In JoinMeeting, response=" + getMeetingErrorMessage(response)); }
             PluginResult pluginResult1;
             if (response != MeetingError.MEETING_ERROR_SUCCESS) {
                 pluginResult1 =  new PluginResult(PluginResult.Status.ERROR, getMeetingErrorMessage(response));
@@ -243,9 +230,6 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
         // Trigger the meeting callback
         sendMeetingCallback(meetingStatus);
 
-        if (DEBUG) {
-            Log.i(TAG, "onMeetingStatusChanged, meetingStatus=" + meetingStatus + ", errorCode=" + errorCode + ", internalErrorCode=" + internalErrorCode);
-        }
         if(meetingStatus == MeetingStatus.MEETING_STATUS_FAILED && errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE) {
             final android.widget.Toast toast = android.widget.Toast.makeText(
                     cordova.getActivity().getApplicationContext(),
@@ -366,9 +350,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
                 break;
         }
 
-        if (DEBUG) {
-            Log.v(TAG, "******getMeetingErrorMessage*********" + message);
-        }
+        Log.v(TAG, "******getMeetingErrorMessage*********" + message);
         return message.toString();
     }
 
