@@ -17,11 +17,11 @@ repositories {
     flatDir {
         dirs 'libs/android'
     }
-   maven {
+    maven {
         url = uri("https://maven.pkg.github.com/pcamilojunior/mobile-sdk-android")
         credentials {
             username = "pcamilojunior"
-            password = "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"
+            password = "ANDROID_ZOOM_SDK_PASSWORD"
         }
     }
 }
@@ -45,7 +45,7 @@ gradle.projectsEvaluated {
 }
 
 dependencies {
-    implementation 'com.outsystems.experts:zoomsdk-android:6.1.1.22760'
+    implementation 'com.outsystems.experts:zoom-sdk-android:6.1.1.22760'
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.0.0'

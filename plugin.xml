@@ -7,6 +7,9 @@
 
      <!-- Android section -->
     <platform name="android">
+
+        <preference name="ANDROID_ZOOM_SDK_PASSWORD"/>
+
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="Zoom">
                 <param name="android-package" value="cordova.plugin.zoom.Zoom" />
@@ -34,6 +37,7 @@
         <source-file framework="true" src="libs/android/commonlib.aar" target-dir="libs/android" />
         <source-file src="src/android/Zoom.java" target-dir="src/cordova/plugin/zoom" />
         <framework custom="true" src="src/android/build-android.gradle" target-dir="." type="gradleReference" />
+        <hook type="after_plugin_install" src="hooks/setUserPasswordZoomSDK.js" />
     </platform>
 
     <!-- IOS section -->
