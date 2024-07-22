@@ -227,17 +227,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
     public void onMeetingStatusChanged(MeetingStatus meetingStatus, int errorCode, int internalErrorCode) {
         Log.i(TAG, "onMeetingStatusChanged, meetingStatus=" + meetingStatus + ", errorCode=" + errorCode + ", internalErrorCode=" + internalErrorCode);
 
-        // Trigger the meeting callback
         sendMeetingCallback(meetingStatus);
-
-        if(meetingStatus == MeetingStatus.MEETING_STATUS_FAILED && errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE) {
-            final android.widget.Toast toast = android.widget.Toast.makeText(
-                    cordova.getActivity().getApplicationContext(),
-                    "Version of ZoomSDK is too low!",
-                    android.widget.Toast.LENGTH_LONG
-            );
-            toast.show();
-        }
     }
 
     @Override
@@ -251,9 +241,7 @@ public class Zoom extends CordovaPlugin implements ZoomSDKInitializeListener, Me
 
         if(errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
             callbackContext.error("Failed to initialize Zoom SDK. Error: " + errorCode + ", internalErrorCode=" + internalErrorCode);
-            Toast.makeText(this.cordova.getContext(), "Failed to initialize Zoom SDK. Error: " + errorCode + ", internalErrorCode=" + internalErrorCode, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this.cordova.getContext(), "Initialize Zoom SDK successfully.", Toast.LENGTH_LONG).show();
             callbackContext.success("Initialize Zoom SDK successfully.");
         }
     }
