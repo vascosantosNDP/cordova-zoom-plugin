@@ -108,8 +108,20 @@ extension Zoom: MobileRTCAuthDelegate {
         switch returnValue {
             case .success:
                 print("✅ SDK auth successful.")
+                let pluginResult: CDVPluginResult
+                pluginResult = CDVPluginResult(status: CDVCommandStatus_OK)
+                if let callbackId = self.command?.callbackId {
+                    self.commandDelegate.send(pluginResult, callbackId: callbackId)
+                }
+                self.command = nil
+                
             default:
-            print("🚨 SDK auth failed: \(returnValue)")
+                print("🚨 SDK auth failed: \(returnValue)")
+                let pluginResult: CDVPluginResult = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: returnValue.rawValue)
+                if let callbackId = self.command?.callbackId {
+                    self.commandDelegate.send(pluginResult, callbackId: callbackId)
+                }
+                self.command = nil
             }
     }
 }
