@@ -32,6 +32,7 @@
             <uses-permission android:name="android.permission.WAKE_LOCK" />
             <uses-permission android:name="android.permission.CALL_PHONE" />
             <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+            <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
         </config-file>
         <dependency id="cordova-androidx-build" url="https://github.com/Pushwoosh/cordova-androidx-build.git" />
         <source-file framework="true" src="libs/android/commonlib.aar" target-dir="libs/android" />
