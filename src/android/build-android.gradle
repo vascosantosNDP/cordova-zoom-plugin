@@ -32,16 +32,16 @@ gradle.projectsEvaluated {
         def gradleProperties = new Properties()
         gradleProperties.load(new FileInputStream(gradlePropertiesFile))
         def hasChanged = false
-        if (gradleProperties['android.enableJetifier'] != 'true') {
+        /*if (gradleProperties['android.enableJetifier'] != 'true') {
             gradleProperties['android.enableJetifier'] = 'true'
             hasChanged = true
-        }
+        }*/
         if (hasChanged) {
             gradleProperties.store(gradlePropertiesFile.newWriter(), 'Updated by build-extras.gradle')
         }
-    } else {
+    } /*else {
         gradlePropertiesFile.text = "android.useAndroidX=true\nandroid.enableJetifier=true"
-    }
+    }*/
 }
 
 dependencies {
